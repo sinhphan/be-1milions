@@ -10,7 +10,7 @@ import { CategoryModule } from './category/category.module';
       port: 3306,
       username: 'root',
       password: 'sinhpc',
-      database: 'nestjs',
+      database: 'test',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),

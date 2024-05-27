@@ -19,4 +19,18 @@ export class CategoryEntity {
 
   @OneToMany(() => CategoryEntity, (category) => category.parentId)
   children: CategoryEntity[];
+
+  @Column({
+    nullable: true,
+    default: null
+  })
+  path: string;
+
+  @Column({
+    nullable: true,
+    default: null
+  })
+  depth: number;
+
+  isSearch?: boolean
 }

@@ -6,12 +6,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
-  async getCategories(@Query() p: { limit: number; page: number }) {
-    return this.categoryService.selectCategories(p);
-  }
-
-  @Post('search')
-  async search(@Body() p: { search: string }) {
+  async search(@Query() p: { limit: number; page: number; keyword: string }) {
     return this.categoryService.search(p);
   }
 }
