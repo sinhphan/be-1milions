@@ -72,32 +72,55 @@ export class CategoryService {
       take: p.limit || 30,
     });
 
-    const result = categories?.map((r) => {
-      r.isSearch = true;
-      return r;
+    const categoryMap = new Map();
+    const expandedKeys = []
+    categories?.forEach((r) => {
+      categoryMap.set(r.id, {
+        title: r.name,
+        value: r.id,
+        key: r.id,
+        parentId: r.parentId,
+        isSearch: true,
+      });
     });
     for (const category of categories) {
       const parent = await this.categoryRepository.find({
         where: { id: In(category.path?.split(',')) },
       });
       parent.forEach((p) => {
-        if (!result?.some((c) => c.id == p.id)) {
-          result.push(p);
-        }
+        categoryMap.set(p.id, {
+          title: p.name,
+          value: p.id,
+          key: p.id,
+          parentId: p.parentId,
+          children: []
+        })
       });
     }
+
+    // Create the root list to store top-level nodes
+    const rootCategories = [];
+
+    // Build the tree structure
+    categoryMap.forEach((category) => {
+      expandedKeys.push(category.key)
+      if (category.parentId === null) {
+        // If the category has no parent, it's a root node
+        rootCategories.push(category);
+      } else {
+        // Otherwise, find the parent and add the category to its children
+        const parent = categoryMap.get(category.parentId);
+        if (parent) {
+          parent.children.push(category);
+        }
+      }
+    });
+
     return {
-      data: result.sort((a, b) => {
-        if (a.path < b.path) {
-          return -1;
-        }
-        if (a.path > b.path) {
-          return 1;
-        }
-        return 0;
-      }),
+      data: rootCategories,
       total,
       page,
+      expandedKeys
     };
   }
 
